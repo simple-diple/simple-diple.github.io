@@ -4,13 +4,14 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity Web Player | web-gl-test</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script> <!-- Telegram API -->
   </head>
   <body style="text-align: center; padding: 0; border: 0; margin: 0;">
     <canvas id="unity-canvas" width=960 height=600 tabindex="-1" style="width: 960px; height: 600px; background: #231F20"></canvas>
     <script src="Build/game.loader.js"></script>
+    
     <script>
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
         var meta = document.createElement('meta');
         meta.name = 'viewport';
         meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
@@ -24,6 +25,8 @@
         document.body.style.textAlign = "left";
       }
 
+      let unityInstance = null;
+
       createUnityInstance(document.querySelector("#unity-canvas"), {
         arguments: [],
         dataUrl: "Build/game.data",
@@ -33,9 +36,29 @@
         companyName: "DefaultCompany",
         productName: "web-gl-test",
         productVersion: "0.1.0",
-        // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
-        // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
+      }).then(instance => {
+        unityInstance = instance;
+        sendTelegramData(); // Отправить данные в Unity после загрузки
       });
+
+      // ✅ Инициализируем Telegram API
+      let tg = window.Telegram.WebApp;
+      tg.expand(); // Развернуть WebApp в Telegram
+
+      function sendTelegramData() {
+        if (!unityInstance) return;
+
+        let user_data = {
+          id: tg.initDataUnsafe?.user?.id || "Unknown",
+          username: tg.initDataUnsafe?.user?.username || "None",
+          first_name: tg.initDataUnsafe?.user?.first_name || "None"
+        };
+
+        console.log("📡 Sending data to Unity:", user_data);
+        unityInstance.SendMessage('TelegramReceiver', 'ReceiveData', JSON.stringify(user_data));
+      }
+
+      tg.ready();
     </script>
   </body>
 </html>
