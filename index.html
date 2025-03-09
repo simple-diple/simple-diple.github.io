@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Cube Control</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script> <!-- Подключаем Telegram API -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script> <!-- Telegram API -->
     <style>
         body { margin: 0; overflow: hidden; }
         canvas { display: block; }
@@ -14,17 +14,24 @@
 <body>
 
 <script>
+    // ✅ Initialize Telegram Web App API
+    let tg = window.Telegram.WebApp;
+    tg.expand(); // Expand Web App inside Telegram
+
+    // ✅ Create 3D scene with Three.js
     let scene = new THREE.Scene();
     let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     let renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
+    // ✅ Create 3D cube
     let geometry = new THREE.BoxGeometry();
     let material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
     let cube = new THREE.Mesh(geometry, material);
     scene.add(cube);
 
+    // ✅ Add lighting
     let light = new THREE.PointLight(0xffffff, 1, 100);
     light.position.set(10, 10, 10);
     scene.add(light);
@@ -37,15 +44,17 @@
     }
     animate();
 
-    // 🔥 Получаем команды от Telegram
-    window.Telegram.WebApp.expand(); // Растягиваем Web App
-    window.addEventListener("message", function(event) {
-        console.log("📡 Получена команда:", event.data);
-        if (event.data === "rotate_left") cube.rotation.y -= 0.1;
-        if (event.data === "rotate_right") cube.rotation.y += 0.1;
-        if (event.data === "move_up") cube.position.y += 0.1;
-        if (event.data === "move_down") cube.position.y -= 0.1;
-    }, false);
+    // ✅ Listen for movement commands from Telegram
+    tg.onEvent("web_app_data", function(event) {
+        let action = event.data;
+        console.log("📡 Received command:", action);
+
+        if (action === "rotate_left") cube.rotation.y -= 0.1;
+        if (action === "rotate_right") cube.rotation.y += 0.1;
+        if (action === "move_up") cube.position.y += 0.1;
+        if (action === "move_down") cube.position.y -= 0.1;
+    });
+
 </script>
 
 </body>
