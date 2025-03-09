@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Cube Control</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script> <!-- Подключаем Telegram API -->
     <style>
         body { margin: 0; overflow: hidden; }
         canvas { display: block; }
-        .controls { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); }
-        button { padding: 10px; margin: 5px; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -38,7 +37,10 @@
     }
     animate();
 
+    // 🔥 Получаем команды от Telegram
+    window.Telegram.WebApp.expand(); // Растягиваем Web App
     window.addEventListener("message", function(event) {
+        console.log("📡 Получена команда:", event.data);
         if (event.data === "rotate_left") cube.rotation.y -= 0.1;
         if (event.data === "rotate_right") cube.rotation.y += 0.1;
         if (event.data === "move_up") cube.position.y += 0.1;
