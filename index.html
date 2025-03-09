@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Cube Control</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+        .controls { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); }
+        button { padding: 10px; margin: 5px; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+<script>
+    let scene = new THREE.Scene();
+    let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    let renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    let geometry = new THREE.BoxGeometry();
+    let material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+    let cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+
+    let light = new THREE.PointLight(0xffffff, 1, 100);
+    light.position.set(10, 10, 10);
+    scene.add(light);
+
+    camera.position.z = 5;
+
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener("message", function(event) {
+        if (event.data === "rotate_left") cube.rotation.y -= 0.1;
+        if (event.data === "rotate_right") cube.rotation.y += 0.1;
+        if (event.data === "move_up") cube.position.y += 0.1;
+        if (event.data === "move_down") cube.position.y -= 0.1;
+    }, false);
+</script>
+
+</body>
+</html>
